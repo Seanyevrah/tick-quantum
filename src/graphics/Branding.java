@@ -23,8 +23,9 @@ public class Branding {
         initializeImages();
     }
 
-    public Color mainColor = Color.decode("#09090B");
-    public Color white = Color.decode("#ffffff");
+    public Color dark = Color.decode("#09090B");
+    public Color light = Color.decode("#ffffff");
+    public Color darkGray = Color.decode("#696969");
     public Color[] processColor = {
         Color.decode("#b75a5a"),
         Color.decode("#b7845a"),

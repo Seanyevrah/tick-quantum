@@ -1,7 +1,10 @@
 package model;
 
+import java.awt.Color;
+
 public class Process {
     private String ID;
+    private Color color;
     private int arrivalTime;
     private int burstTime;
     private int remainingTime;
@@ -10,8 +13,9 @@ public class Process {
     private int turnaroundTime;
     private int waitingTime;
 
-    public Process(String ID, int arrivalTime, int burstTime, int priority) {
+    public Process(String ID, Color color, int arrivalTime, int burstTime, int priority) {
         this.ID = ID;
+        this.color = color;
         this.arrivalTime = arrivalTime;
         this.burstTime = burstTime;
         this.remainingTime = burstTime;
@@ -29,6 +33,14 @@ public class Process {
 
     public void setID(String iD) {
         ID = iD;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public int getArrivalTime() {
