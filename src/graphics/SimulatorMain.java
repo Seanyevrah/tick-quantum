@@ -2,6 +2,9 @@ package graphics;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -32,14 +35,6 @@ public class SimulatorMain extends JPanel {
     private JPanel processTablePanel;
     private JLabel processIdHeader, burstTimeHeader, arrivalTimeHeader, priorityNoHeader;
 
-    // Scheduling algorithms
-    private FCFS fcfs;
-    private SJF sjf;
-    private SRTF srtf;
-    private RoundRobin roundRobin;
-    private PriorityPreemptive priorityPreemptive;
-    private PriorityNonPreemptive priorityNonPreemptive;
-
     private ArrayList<Process> processes = new ArrayList<>();
 
     public SimulatorMain(MainEngine mainEngine, Branding branding) {
@@ -49,20 +44,10 @@ public class SimulatorMain extends JPanel {
         setLayout(new BorderLayout());
         setBackground(branding.dark);
 
-        initializeSchedulingAlgorithms();
         initializeMainPanel();
         initializePanels();
 
         updateAlgorithmFields();
-    }
-
-    private void initializeSchedulingAlgorithms() {
-        fcfs = new FCFS();
-        sjf = new SJF();
-        srtf = new SRTF();
-        roundRobin = new RoundRobin();
-        priorityPreemptive = new PriorityPreemptive();
-        priorityNonPreemptive = new PriorityNonPreemptive();
     }
 
     public void initializeMainPanel() {
@@ -135,6 +120,7 @@ public class SimulatorMain extends JPanel {
         algorithmCard.setLayout(new BoxLayout(algorithmCard, BoxLayout.Y_AXIS));
         algorithmCard.setBorder(new EmptyBorder(16, 16, 16, 16));
         algorithmCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        algorithmCard.setPreferredSize(new Dimension(getWidth(), 300));
         algorithmCard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 240));
 
         algorithmLabel = new JLabel("Algorithm");
@@ -143,9 +129,9 @@ public class SimulatorMain extends JPanel {
         algorithmLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         String[] algorithms = {
-            "FCFS (First Come Fir...",
+            "FCFS (First Come First Serve)",
             "SJF (Shortest Job First)",
-            "SRTF (Shortest Remaining...)",
+            "SRTF (Shortest Remaining Time First)",
             "Round Robin",
             "Priority (Preemptive)",
             "Priority (Non-Preemptive)"
@@ -174,9 +160,16 @@ public class SimulatorMain extends JPanel {
         simulateWrapper.add(simulateButton);
         simulateButton.addActionListener(e -> {
             if (!validateProcessTable()) return;
+            
+            String algorithm = (String) algorithmComboBox.getSelectedItem();
+            int quantum = 0;
 
-            // proceed with simulation
-            // runSimulation();
+            if (algorithm.contains("Round Robin")) {
+                quantum = Integer.parseInt(quantumTimeField.getText().trim());
+            }
+
+            ArrayList<Process> processes = mainEngine.getGUI().getSimulatorMain().getProcesses();
+            mainEngine.runSimulation(processes, algorithm, quantum);
         });
 
         algorithmCard.add(algorithmLabel);
@@ -186,7 +179,7 @@ public class SimulatorMain extends JPanel {
         algorithmCard.add(quantumTimeLabel);
         algorithmCard.add(Box.createVerticalStrut(6));
         algorithmCard.add(quantumTimeField);
-        algorithmCard.add(Box.createVerticalStrut(18));
+        algorithmCard.add(Box.createVerticalStrut(50));
         algorithmCard.add(simulateWrapper);
 
         JPanel actionsCard = new JPanel();
@@ -205,11 +198,11 @@ public class SimulatorMain extends JPanel {
         importTextFileButton.addActionListener(e -> importFromFile());
 
         actionsCard.add(addProcessButton);
-        actionsCard.add(Box.createVerticalStrut(10));
+        actionsCard.add(Box.createVerticalStrut(20));
         actionsCard.add(removeProcessButton);
-        actionsCard.add(Box.createVerticalStrut(10));
+        actionsCard.add(Box.createVerticalStrut(20));
         actionsCard.add(importTextFileButton);
-        actionsCard.add(Box.createVerticalStrut(10));
+        actionsCard.add(Box.createVerticalStrut(20));
         actionsCard.add(randomProcessesButton);
         actionsCard.add(Box.createVerticalGlue());
         
@@ -258,9 +251,9 @@ public class SimulatorMain extends JPanel {
         processTablePanel.setBorder(new EmptyBorder(0, 20, 20, 20));
 
         processTablePanel.add(createProcessRow("P1", branding.processColor[0], "2", "0", false));
-        processTablePanel.add(Box.createVerticalStrut(10));
+        processTablePanel.add(Box.createVerticalStrut(20));
         processTablePanel.add(createProcessRow("P2", branding.processColor[1], "2", "2", false));
-        processTablePanel.add(Box.createVerticalStrut(10));
+        processTablePanel.add(Box.createVerticalStrut(20));
         processTablePanel.add(createProcessRow("P3", branding.processColor[2], "2", "4", false));
 
         Process p1 = new Process("P1", branding.processColor[0], 0, 2, 1);
@@ -296,7 +289,7 @@ public class SimulatorMain extends JPanel {
 
     public JPanel createProcessRow(String name, Color labelColor,
                                     String burst, String arrival, boolean priorityEnabled) {
-        JPanel row = new JPanel(new GridLayout(1, 4, 10, 0));
+        JPanel row = new JPanel(new GridLayout(1, 4, 20, 0));
         row.setBackground(branding.dark);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
         
@@ -317,14 +310,9 @@ public class SimulatorMain extends JPanel {
         
         JTextField priorityField = new JTextField();
         priorityField.setHorizontalAlignment(JTextField.CENTER);
-        if (priorityEnabled) {
-            styleTextField(priorityField);
-        } else {
-            priorityField.setEnabled(false);
-            priorityField.setBackground(branding.dark);
-        }
-        styleTextField(priorityField);
-        priorityField.setForeground(branding.darkGray);
+        priorityField.setText("");
+        
+        styleProcessField(priorityField, priorityEnabled);
 
         row.add(idLabel);
         row.add(burstField);
@@ -437,8 +425,8 @@ public class SimulatorMain extends JPanel {
     }
 
     public void addProcess() {
-        int currentCount = processTablePanel.getComponentCount() / 2 + 1;
-        if (currentCount >= 20) return;
+        int currentCount = processTablePanel.getComponentCount() / 2 + 2;
+        if (currentCount > 20) return;
 
         String id = "P" + currentCount;
         Color color = new Color((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255));
@@ -447,7 +435,7 @@ public class SimulatorMain extends JPanel {
         boolean priorityEnabled = isPriorityAlgorithm();
 
         JPanel newRow = createProcessRow(id, color, "1", "0", priorityEnabled);
-        processTablePanel.add(Box.createVerticalStrut(10));
+        processTablePanel.add(Box.createVerticalStrut(20));
         processTablePanel.add(newRow);
         processTablePanel.revalidate();
         processTablePanel.repaint();
@@ -466,25 +454,35 @@ public class SimulatorMain extends JPanel {
     public void randomProcesses() {
         processTablePanel.removeAll();
 
-        int processCount = 3 + (int)(Math.random() * 18);
+        int processCount = 3 + (int)(Math.random() * 18); // 3–20 processes
         boolean priorityEnabled = isPriorityAlgorithm();
+        
+        ArrayList<Integer> priorities = new ArrayList<>();
+        if (priorityEnabled) {
+            for (int i = 1; i <= 20; i++) {
+                priorities.add(i);
+            }
+            Collections.shuffle(priorities);
+        }
 
         for (int i = 0; i < processCount; i++) {
             String id = "P" + (i + 1);
-            
-            String burst = String.valueOf(1 + (int)(Math.random() * 10));
-            String arrival = String.valueOf((int)(Math.random() * 10));
-            
-            String priority = priorityEnabled ? String.valueOf(1 + (int)(Math.random() * 5)) : "";
-            
+
+            // Burst: 1–30
+            String burst = String.valueOf(1 + (int)(Math.random() * 30));
+
+            // Arrival: 0–30
+            String arrival = String.valueOf((int)(Math.random() * 31));
+
             Color color = branding.processColor[i % branding.processColor.length];
 
             JPanel row = createProcessRow(id, color, burst, arrival, priorityEnabled);
-            
+
             if (priorityEnabled) {
+                String priority = String.valueOf(priorities.get(i));
                 JTextField priorityField = (JTextField) row.getComponent(3);
                 priorityField.setText(priority);
-                styleProcessField(priorityField, priorityEnabled);
+                styleProcessField(priorityField, true);
             } else {
                 JTextField priorityField = (JTextField) row.getComponent(3);
                 styleProcessField(priorityField, false);
@@ -493,7 +491,7 @@ public class SimulatorMain extends JPanel {
 
             processTablePanel.add(row);
             if (i < processCount - 1) {
-                processTablePanel.add(Box.createVerticalStrut(10));
+                processTablePanel.add(Box.createVerticalStrut(20));
             }
         }
 
@@ -527,6 +525,7 @@ public class SimulatorMain extends JPanel {
             if (comp instanceof JPanel) {
                 JPanel row = (JPanel) comp;
                 JTextField priorityField = (JTextField) row.getComponent(3);
+                priorityField.setEnabled(priority);
                 styleProcessField(priorityField, priority);
             }
         }
@@ -534,10 +533,11 @@ public class SimulatorMain extends JPanel {
 
     private void styleProcessField(JTextField field, boolean enabled) {
         field.setEnabled(enabled);
+        field.setBackground(branding.dark);
         field.setForeground(enabled ? branding.light : branding.darkGray);
         field.setCaretColor(enabled ? branding.light : branding.darkGray);
         field.setBorder(BorderFactory.createCompoundBorder(
-            new LineBorder(enabled ? branding.light : branding.darkGray, 1, true),
+            new LineBorder(enabled ? branding.light : branding.darkGray, 2, true),
             new EmptyBorder(6, 10, 6, 10)
         ));
     }
@@ -546,36 +546,78 @@ public class SimulatorMain extends JPanel {
         label.setForeground(enabled ? branding.light : branding.darkGray);
     }
 
-    private boolean validateProcessTable() {
-        if (quantumTimeField.isEnabled() && !isInteger(quantumTimeField.getText())) {
-            showValidationError("Quantum Time must be an integer.");
-            return false;
+    public boolean validateProcessTable() {
+        if (algorithmComboBox.getSelectedItem().toString().contains("Round Robin")) {
+            if (!isInteger(quantumTimeField.getText())) {
+                showValidationError("Quantum Time must be an integer.");
+                return false;
+            }
+
+            int quantum = Integer.parseInt(quantumTimeField.getText().trim());
+
+            if (quantum < 1 || quantum > 10) {
+                showValidationError("Quantum Time must be between 1 and 10.");
+                return false;
+            }
         }
+        
+        Set<Integer> usedPriorities = new HashSet<>();
 
         for (Component comp : processTablePanel.getComponents()) {
-            if (comp instanceof JPanel) {
-                JPanel row = (JPanel) comp;
-                Component[] fields = row.getComponents();
-                
-                JTextField burstField = (JTextField) fields[1];
-                if (!isInteger(burstField.getText())) {
-                    showValidationError("Burst Time must be an integer.");
-                    return false;
-                }
-                
-                JTextField arrivalField = (JTextField) fields[2];
-                if (!isInteger(arrivalField.getText())) {
-                    showValidationError("Arrival Time must be an integer.");
-                    return false;
-                }
-                
-                JTextField priorityField = (JTextField) fields[3];
-                if (priorityField.isEnabled() && !isInteger(priorityField.getText())) {
+            if (!(comp instanceof JPanel)) continue;
+
+            JPanel row = (JPanel) comp;
+            Component[] fields = row.getComponents();
+
+            JTextField burstField = (JTextField) fields[1];
+            JTextField arrivalField = (JTextField) fields[2];
+            JTextField priorityField = (JTextField) fields[3];
+
+            // ---- Burst ----
+            if (!isInteger(burstField.getText())) {
+                showValidationError("Burst Time must be an integer.");
+                return false;
+            }
+
+            int burst = Integer.parseInt(burstField.getText().trim());
+            if (burst < 1 || burst > 30) {
+                showValidationError("Burst Time must be between 1 and 30.");
+                return false;
+            }
+
+            // ---- Arrival ----
+            if (!isInteger(arrivalField.getText())) {
+                showValidationError("Arrival Time must be an integer.");
+                return false;
+            }
+
+            int arrival = Integer.parseInt(arrivalField.getText().trim());
+            if (arrival < 0 || arrival > 30) {
+                showValidationError("Arrival Time must be between 0 and 30.");
+                return false;
+            }
+
+            // ---- Priority ----
+            if (priorityField.isEnabled()) {
+                if (!isInteger(priorityField.getText())) {
                     showValidationError("Priority must be an integer.");
+                    return false;
+                }
+
+                int priority = Integer.parseInt(priorityField.getText().trim());
+
+                if (priority < 1 || priority > 20) {
+                    showValidationError("Priority must be between 1 and 20.");
+                    return false;
+                }
+
+                if (!usedPriorities.add(priority)) {
+                    showValidationError("Priority values must not duplicate.");
                     return false;
                 }
             }
         }
+
         return true;
     }
 
@@ -592,6 +634,20 @@ public class SimulatorMain extends JPanel {
             return false;
         }
     }
+
+
+    // ==================================================
+    //                GETTERS AND SETTERS
+    // ==================================================
+
+    public ArrayList<Process> getProcesses() {
+        return this.processes;
+    }
+
+    
+    // ==================================================
+    //                   ROUND BORDER
+    // ==================================================
     
     public static class RoundedBorder extends AbstractBorder {
         private final int radius;

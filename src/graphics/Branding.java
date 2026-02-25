@@ -27,26 +27,26 @@ public class Branding {
     public Color light = Color.decode("#ffffff");
     public Color darkGray = Color.decode("#696969");
     public Color[] processColor = {
-        Color.decode("#b75a5a"),
-        Color.decode("#b7845a"),
-        Color.decode("#b7b45a"),
-        Color.decode("#8ab75a"),
-        Color.decode("#5ab760"),
-        Color.decode("#5ab78a"),
-        Color.decode("#5ab7b4"),
-        Color.decode("#5a9db7"),
-        Color.decode("#5a76b7"),
-        Color.decode("#715ab7"),
-        Color.decode("#9a5ab7"),
-        Color.decode("#b75aaf"),
-        Color.decode("#b75a7e"),
-        Color.decode("#d63636"),
-        Color.decode("#d69136"),
-        Color.decode("#c9d636"),
-        Color.decode("#36d63b"),
-        Color.decode("#36d6d6"),
-        Color.decode("#3669d6"),
-        Color.decode("#7e36d6")
+        Color.decode("#E53935"),
+        Color.decode("#D81B60"),
+        Color.decode("#8E24AA"),
+        Color.decode("#5E35B1"),
+        Color.decode("#3949AB"),
+        Color.decode("#1E88E5"),
+        Color.decode("#039BE5"),
+        Color.decode("#00ACC1"),
+        Color.decode("#00897B"),
+        Color.decode("#43A047"),
+        Color.decode("#7CB342"),
+        Color.decode("#C0CA33"),
+        Color.decode("#FDD835"),
+        Color.decode("#FFB300"),
+        Color.decode("#FB8C00"),
+        Color.decode("#F4511E"),
+        Color.decode("#6D4C41"),
+        Color.decode("#546E7A"),
+        Color.decode("#EC407A"),
+        Color.decode("#7E57C2")
     };
 
     public void initializeFonts() {

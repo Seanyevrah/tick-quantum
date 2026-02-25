@@ -52,4 +52,13 @@ public class MainGUI {
         // mainPanel.add(scrnGameOver, "ScreenGameOver");
         mainFrame.add(mainPanel);
     }
+
+
+    // ==================================================
+    //                GETTERS AND SETTERS
+    // ==================================================
+
+    public SimulatorMain getSimulatorMain() {
+        return simulatorMain;
+    }
 }
