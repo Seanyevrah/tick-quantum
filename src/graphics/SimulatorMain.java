@@ -9,13 +9,13 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.border.*;
 import engine.MainEngine;
-import graphics.SimulatorMain.RoundedBorder;
 import scheduler.*;
 import model.Process;
 
 public class SimulatorMain extends JPanel {
     private Branding branding;
     private MainEngine mainEngine;
+    private JPanel parentContainer;
 
     private JPanel mainPanel;
     private JPanel leftPanel, rightPanel;
@@ -37,9 +37,10 @@ public class SimulatorMain extends JPanel {
 
     private ArrayList<Process> processes = new ArrayList<>();
 
-    public SimulatorMain(MainEngine mainEngine, Branding branding) {
+    public SimulatorMain(MainEngine mainEngine, Branding branding, JPanel parentContainer) {
         this.branding = branding;
         this.mainEngine = mainEngine;
+        this.parentContainer = parentContainer;
 
         setLayout(new BorderLayout());
         setBackground(branding.dark);
@@ -170,6 +171,9 @@ public class SimulatorMain extends JPanel {
 
             ArrayList<Process> processes = mainEngine.getGUI().getSimulatorMain().getProcesses();
             mainEngine.runSimulation(processes, algorithm, quantum);
+
+            CardLayout cl = (CardLayout) parentContainer.getLayout();
+            cl.show(parentContainer, "SimulatorOutput");
         });
 
         algorithmCard.add(algorithmLabel);
@@ -298,7 +302,7 @@ public class SimulatorMain extends JPanel {
         idLabel.setForeground(branding.light);
         idLabel.setOpaque(true);
         idLabel.setBackground(labelColor);
-        idLabel.setBorder(new RoundedBorder(10, labelColor));
+        idLabel.setBorder(new LineBorder(labelColor, 10));
         
         JTextField burstField = new JTextField(burst);
         styleTextField(burstField);
@@ -642,38 +646,5 @@ public class SimulatorMain extends JPanel {
 
     public ArrayList<Process> getProcesses() {
         return this.processes;
-    }
-
-    
-    // ==================================================
-    //                   ROUND BORDER
-    // ==================================================
-    
-    public static class RoundedBorder extends AbstractBorder {
-        private final int radius;
-        private final Color color;
-
-        RoundedBorder(int radius, Color color) {
-            this.radius = radius;
-            this.color  = color;
-        }
-
-        @Override
-        public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(color);
-            g2.drawRoundRect(x, y, w - 1, h - 1, radius * 2, radius * 2);
-            g2.dispose();
-        }
-
-        @Override
-        public Insets getBorderInsets(Component c) { return new Insets(4, 8, 4, 8); }
-
-        @Override
-        public Insets getBorderInsets(Component c, Insets insets) {
-            insets.set(4, 8, 4, 8);
-            return insets;
-        }
     }
 }

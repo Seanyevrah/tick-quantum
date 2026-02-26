@@ -10,6 +10,7 @@ import scheduler.RoundRobin;
 import scheduler.SJF;
 import scheduler.SRTF;
 import model.Process;
+import util.GanttChartBlocks;
 
 public class MainEngine {
     private MainGUI gui;
@@ -21,7 +22,12 @@ public class MainEngine {
     private PriorityPreemptive priorityPreemptive;
     private PriorityNonPreemptive priorityNonPreemptive;
 
+    private ArrayList<Process> finalProcesses;
+    private ArrayList<GanttChartBlocks> ganttChartBlocks;
+
     public MainEngine() {
+        finalProcesses = new ArrayList<>();
+        ganttChartBlocks = new ArrayList<>();
         initializeAlgorithms();
     }
 
@@ -35,6 +41,8 @@ public class MainEngine {
     }
 
     public void runSimulation(ArrayList<Process> processes, String algorithm, int quantum) {
+        ganttChartBlocks.clear();
+        
         if (processes == null || processes.isEmpty()) {
             System.out.println("No processes to simulate.");
             return;
@@ -44,28 +52,34 @@ public class MainEngine {
 
         switch (algorithm) {
             case "FCFS (First Come First Serve)":
-                fcfs.run(processes);
+                finalProcesses = fcfs.run(processes);
+                ganttChartBlocks = fcfs.getGanttChartBlocks();
                 break;
 
             case "SJF (Shortest Job First)":
-                sjf.run(processes);
+                finalProcesses = sjf.run(processes);
+                ganttChartBlocks = sjf.getGanttChartBlocks();
                 break;
 
             case "SRTF (Shortest Remaining Time First)":
-                srtf.run(processes);
+                finalProcesses = srtf.run(processes);
+                ganttChartBlocks = srtf.getGanttChartBlocks();
                 break;
 
             case "Round Robin":
                 roundRobin.setQuantumTime(quantum);
-                roundRobin.run(processes);
+                finalProcesses = roundRobin.run(processes);
+                ganttChartBlocks = roundRobin.getGanttChartBlocks();
                 break;
 
             case "Priority (Preemptive)":
-                priorityPreemptive.run(processes);
+                finalProcesses = priorityPreemptive.run(processes);
+                ganttChartBlocks = priorityPreemptive.getGanttChartBlocks();
                 break;
 
             case "Priority (Non-Preemptive)":
-                priorityNonPreemptive.run(processes);
+                finalProcesses = priorityNonPreemptive.run(processes);
+                ganttChartBlocks = priorityNonPreemptive.getGanttChartBlocks();
                 break;
 
             default:

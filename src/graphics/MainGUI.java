@@ -16,6 +16,7 @@ public class MainGUI {
     private JPanel mainPanel;
 
     private SimulatorMain simulatorMain;
+    private SimulatorOutput simulatorOutput;
 
     public MainGUI(MainEngine engine) {
         this.engine = engine;
@@ -41,15 +42,11 @@ public class MainGUI {
         mainPanel.setBackground(branding.dark);
         mainPanel.setLayout(new CardLayout());
         
-        simulatorMain = new SimulatorMain(engine, branding);
-        // scrnStartScreen = new ScreenStart(engine, branding);
-        // scrnDesktop = new ScreenDesktop(engine, branding);
-        // scrnGameOver = new ScreenGameOver(engine, branding);
-
+        simulatorMain = new SimulatorMain(engine, branding, mainPanel);
+        simulatorOutput = new SimulatorOutput(engine, branding, mainPanel);
+        
         mainPanel.add(simulatorMain, "SimulatorMain");
-        // mainPanel.add(scrnStartScreen, "ScreenStart");
-        // mainPanel.add(scrnDesktop, "ScreenDesktop");
-        // mainPanel.add(scrnGameOver, "ScreenGameOver");
+        mainPanel.add(simulatorOutput, "SimulatorOutput");
         mainFrame.add(mainPanel);
     }
 

@@ -1,12 +1,16 @@
 package scheduler;
 
 import model.Process;
+import util.GanttChartBlocks;
 import java.util.ArrayList;
 
 public class RoundRobin {
-    private int quantum;
+    private ArrayList<GanttChartBlocks> ganttChartBlocks;
+    private int quantumTime;
 
-    public RoundRobin() {}
+    public RoundRobin() {
+        ganttChartBlocks = new ArrayList<>();
+    }
 
     public ArrayList<Process> run(ArrayList<Process> process) {
         ArrayList<Process> processResult = new ArrayList<>();
@@ -14,11 +18,24 @@ public class RoundRobin {
         return processResult;
     }
 
-    public void setQuantumTime(int quantum) {
-        this.quantum = quantum;
+
+    // ==================================================
+    //                GETTERS AND SETTERS
+    // ==================================================
+
+    public ArrayList<GanttChartBlocks> getGanttChartBlocks() {
+        return ganttChartBlocks;
+    }
+
+    public void setGanttChartBlocks(ArrayList<GanttChartBlocks> ganttChartBlocks) {
+        this.ganttChartBlocks = ganttChartBlocks;
     }
 
     public int getQuantumTime() {
-        return quantum;
+        return quantumTime;
+    }
+
+    public void setQuantumTime(int quantumTime) {
+        this.quantumTime = quantumTime;
     }
 }

@@ -1,14 +1,32 @@
 package scheduler;
 
 import model.Process;
+import util.GanttChartBlocks;
 import java.util.ArrayList;
 
 public class SJF {
-    public SJF() {}
+    private ArrayList<GanttChartBlocks> ganttChartBlocks;
+
+    public SJF() {
+        ganttChartBlocks = new ArrayList<>();
+    }
 
     public ArrayList<Process> run(ArrayList<Process> process) {
         ArrayList<Process> processResult = new ArrayList<>();
 
         return processResult;
+    }
+
+
+    // ==================================================
+    //                GETTERS AND SETTERS
+    // ==================================================
+
+    public ArrayList<GanttChartBlocks> getGanttChartBlocks() {
+        return ganttChartBlocks;
+    }
+
+    public void setGanttChartBlocks(ArrayList<GanttChartBlocks> ganttChartBlocks) {
+        this.ganttChartBlocks = ganttChartBlocks;
     }
 }
