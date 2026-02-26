@@ -174,6 +174,8 @@ public class SimulatorMain extends JPanel {
 
             CardLayout cl = (CardLayout) parentContainer.getLayout();
             cl.show(parentContainer, "SimulatorOutput");
+
+            mainEngine.getGUI().getSimulatorOutput().loadSimulationResults();
         });
 
         algorithmCard.add(algorithmLabel);

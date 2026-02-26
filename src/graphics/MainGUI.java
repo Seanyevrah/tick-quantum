@@ -58,4 +58,8 @@ public class MainGUI {
     public SimulatorMain getSimulatorMain() {
         return simulatorMain;
     }
+    
+    public SimulatorOutput getSimulatorOutput() {
+        return simulatorOutput;
+    }
 }

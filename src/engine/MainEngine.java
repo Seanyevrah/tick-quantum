@@ -42,7 +42,7 @@ public class MainEngine {
 
     public void runSimulation(ArrayList<Process> processes, String algorithm, int quantum) {
         ganttChartBlocks.clear();
-        
+
         if (processes == null || processes.isEmpty()) {
             System.out.println("No processes to simulate.");
             return;
@@ -88,6 +88,7 @@ public class MainEngine {
         }
 
         // After simulation, you could update the GUI
+        
         // e.g., gui.getSimulatorMain().updateGanttChart(result);
     }
 
@@ -99,7 +100,24 @@ public class MainEngine {
     public void setGUI(MainGUI gui) {
         this.gui = gui;
     }
+    
     public MainGUI getGUI() {
         return gui;
+    }
+
+    public ArrayList<Process> getFinalProcesses() {
+        return finalProcesses;
+    }
+
+    public void setFinalProcesses(ArrayList<Process> finalProcesses) {
+        this.finalProcesses = finalProcesses;
+    }
+
+    public ArrayList<GanttChartBlocks> getGanttChartBlocks() {
+        return ganttChartBlocks;
+    }
+
+    public void setGanttChartBlocks(ArrayList<GanttChartBlocks> ganttChartBlocks) {
+        this.ganttChartBlocks = ganttChartBlocks;
     }
 }
