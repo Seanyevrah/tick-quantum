@@ -56,7 +56,7 @@ public class SplashScreen extends JPanel {
                 g2.setColor(getBackground());
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, getHeight(), getHeight());
                 g2.dispose();
                 super.paintComponent(g);

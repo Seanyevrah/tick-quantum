@@ -87,9 +87,7 @@ public class MainEngine {
                 break;
         }
 
-        // After simulation, you could update the GUI
-        
-        // e.g., gui.getSimulatorMain().updateGanttChart(result);
+        gui.getSimulatorOutput().setAlgorithmNameLabel(algorithm);
     }
 
 

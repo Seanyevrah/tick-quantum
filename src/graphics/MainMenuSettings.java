@@ -15,7 +15,6 @@ public class MainMenuSettings extends JPanel {
     private Runnable backAction;
     private Runnable themeChangeListener;
 
-    // Content components
     private JLabel titleLabel;
     private JLabel themeSectionLabel;
     private JPanel themeUnderline;
@@ -23,8 +22,7 @@ public class MainMenuSettings extends JPanel {
     private JLabel darkLabel, lightLabel;
     private JButton backButton;
     private JPanel container;
-
-    // Checkbox state
+    
     private boolean darkSelected  = true;
     private boolean lightSelected = false;
 
@@ -46,9 +44,8 @@ public class MainMenuSettings extends JPanel {
     public void setThemeChangeListener(Runnable listener) {
         this.themeChangeListener = listener;
     }
-
-    // ── Layout ────────────────────────────────────────────────────────────
-    private void initializeMainPanel() {
+    
+    public void initializeMainPanel() {
         JPanel margin = new JPanel(new BorderLayout());
         margin.setOpaque(false);
 
@@ -66,7 +63,7 @@ public class MainMenuSettings extends JPanel {
                 g2.setColor(branding.dark);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 30, 30);
                 g2.dispose();
             }
@@ -85,39 +82,32 @@ public class MainMenuSettings extends JPanel {
         margin.add(container, BorderLayout.CENTER);
         add(margin, BorderLayout.CENTER);
     }
-
-    // ── Build components — all fields assigned before any listener fires ──
-    private void buildContent(JPanel c) {
-
-        // Title
+    
+    public void buildContent(JPanel c) {
         titleLabel = new JLabel("Settings", SwingConstants.CENTER);
         titleLabel.setFont(branding.jetBrainsBExtraLarge);
         titleLabel.setForeground(branding.light);
         c.add(titleLabel);
-
-        // "Theme" section label
+        
         themeSectionLabel = new JLabel("Theme");
         themeSectionLabel.setFont(branding.jetBrainsBLarge);
         themeSectionLabel.setForeground(branding.light);
         c.add(themeSectionLabel);
-
-        // Underline beneath "Theme"
+        
         themeUnderline = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawLine(0, 0, getWidth(), 0);
                 g2.dispose();
             }
         };
         themeUnderline.setOpaque(false);
         c.add(themeUnderline);
-
-        // ── Create BOTH checkboxes first so neither field is null when
-        //    a MouseListener fires on the other one. ──────────────────────
-        darkCheckbox  = makeCheckbox(true);
+        
+        darkCheckbox = makeCheckbox(true);
         lightCheckbox = makeCheckbox(false);
         c.add(darkCheckbox);
         c.add(lightCheckbox);
@@ -131,8 +121,7 @@ public class MainMenuSettings extends JPanel {
         lightLabel.setFont(branding.jetBrainsBMedium);
         lightLabel.setForeground(branding.light);
         c.add(lightLabel);
-
-        // Back to Menu button
+        
         backButton = new JButton("Back to Menu") {
             @Override
             protected void paintComponent(Graphics g) {
@@ -141,7 +130,7 @@ public class MainMenuSettings extends JPanel {
                 g2.setColor(branding.dark);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, getHeight(), getHeight());
                 g2.dispose();
                 super.paintComponent(g);
@@ -162,26 +151,21 @@ public class MainMenuSettings extends JPanel {
         });
         c.add(backButton);
     }
-
-    // ── Reposition on resize ──────────────────────────────────────────────
-    private void repositionContent(int W, int H) {
+    
+    public void repositionContent(int W, int H) {
         int pad = (int) (W * 0.05);
-
-        // Title
+        
         titleLabel.setBounds(0, (int)(H * 0.04), W, (int)(H * 0.15));
-
-        // "Theme" section
+        
         int sectionY = (int) (H * 0.22);
         int sectionH = (int) (H * 0.09);
         themeSectionLabel.setBounds(pad, sectionY, (int)(W * 0.6), sectionH);
-
-        // Underline
+        
         themeUnderline.setBounds(pad, sectionY + sectionH, W - pad * 2, 2);
-
-        // Checkbox row
-        int rowY   = sectionY + sectionH + (int)(H * 0.04);
+        
+        int rowY = sectionY + sectionH + (int)(H * 0.04);
         int cbSize = (int) (H * 0.07);
-        int gap    = (int) (W * 0.015);
+        int gap = (int) (W * 0.015);
 
         int darkX  = pad * 2;
         darkCheckbox.setBounds(darkX, rowY, cbSize, cbSize);
@@ -190,14 +174,12 @@ public class MainMenuSettings extends JPanel {
         int lightX = (int)(W * 0.48);
         lightCheckbox.setBounds(lightX, rowY, cbSize, cbSize);
         lightLabel.setBounds(lightX + cbSize + gap, rowY, (int)(W * 0.12), cbSize);
-
-        // Back to Menu — pinned to bottom-left
+        
         int btnW = 200, btnH = 48;
         backButton.setBounds(pad, H - btnH - pad, btnW, btnH);
     }
-
-    // ── Checkbox factory ──────────────────────────────────────────────────
-    private JPanel makeCheckbox(boolean isDark) {
+    
+    public JPanel makeCheckbox(boolean isDark) {
         JPanel cb = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -205,15 +187,13 @@ public class MainMenuSettings extends JPanel {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                int s   = Math.min(getWidth(), getHeight());
+                int s = Math.min(getWidth(), getHeight());
                 int arc = (int)(s * 0.2);
-
-                // Outer rounded square border
+                
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(2f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(1, 1, s - 2, s - 2, arc, arc);
-
-                // Inner fill — reads from the outer instance fields directly
+                
                 boolean active = isDark ? darkSelected : lightSelected;
                 if (active) {
                     int inset = (int)(s * 0.18);
@@ -229,29 +209,25 @@ public class MainMenuSettings extends JPanel {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 boolean wasAlreadySelected = isDark ? darkSelected : lightSelected;
-                if (wasAlreadySelected) return; // clicking the active option does nothing
+                if (wasAlreadySelected) return;
 
                 darkSelected  = isDark;
                 lightSelected = !isDark;
-
-                // Swap branding.dark ↔ branding.light
+                
                 branding.toggleTheme();
-
-                // Walk every component in the UI and reset its background/foreground,
-                // then repaint the whole card panel
+                
                 if (themeChangeListener != null) themeChangeListener.run();
             }
         });
 
         return cb;
     }
-
-    // ── Helpers ───────────────────────────────────────────────────────────
-    private JPanel blankPanel(int height, int width, boolean isHorizontal) {
+    
+    public JPanel blankPanel(int height, int width, boolean isHorizontal) {
         JPanel p = new JPanel();
         p.setOpaque(false);
         if (isHorizontal) p.setPreferredSize(new Dimension(width, 0));
-        else              p.setPreferredSize(new Dimension(0, height));
+        else p.setPreferredSize(new Dimension(0, height));
         return p;
     }
 

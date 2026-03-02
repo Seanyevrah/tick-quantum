@@ -87,7 +87,7 @@ public class SimulatorOutput extends JPanel {
                 g2.setColor(branding.dark);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 18, 18);
                 g2.dispose();
             }
@@ -102,7 +102,7 @@ public class SimulatorOutput extends JPanel {
         timerLabel.setForeground(branding.light);
 
         // --- Algorithm name (top-right) ---
-        algorithmNameLabel = new JLabel("First Come First Serve");
+        algorithmNameLabel = new JLabel("");
         algorithmNameLabel.setFont(branding.jetBrainsBMedium);
         algorithmNameLabel.setForeground(branding.light);
         algorithmNameLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -202,7 +202,7 @@ public class SimulatorOutput extends JPanel {
                 g2.setColor(branding.dark);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 18, 18);
                 g2.dispose();
             }
@@ -344,7 +344,7 @@ public class SimulatorOutput extends JPanel {
                 g2.setColor(branding.dark);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, getHeight(), getHeight());
                 g2.dispose();
                 super.paintComponent(g);
@@ -558,5 +558,9 @@ public class SimulatorOutput extends JPanel {
             tableScrollPane.revalidate();
             tableScrollPane.repaint();
         }
+    }
+
+    public void setAlgorithmNameLabel(String label) {
+        algorithmNameLabel.setText(label);
     }
 }

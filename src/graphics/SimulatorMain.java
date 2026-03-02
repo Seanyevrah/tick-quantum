@@ -89,7 +89,7 @@ public class SimulatorMain extends JPanel {
                 g2.setColor(branding.dark);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 18, 18);
                 g2.dispose();
             }
@@ -110,7 +110,7 @@ public class SimulatorMain extends JPanel {
                 g2.setColor(branding.dark);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 14, 14);
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 14, 14);
                 g2.dispose();
             }
@@ -166,7 +166,7 @@ public class SimulatorMain extends JPanel {
             if (algorithm.contains("Round Robin")) {
                 quantum = Integer.parseInt(quantumTimeField.getText().trim());
             }
-
+            
             ArrayList<Process> processes = mainEngine.getGUI().getSimulatorMain().getProcesses();
             mainEngine.runSimulation(processes, algorithm, quantum);
 
@@ -227,7 +227,7 @@ public class SimulatorMain extends JPanel {
                 g2.setColor(branding.dark);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(1, 1, getWidth() - 2, getHeight() - 2, 20, 20);
                 g2.dispose();
             }
@@ -324,7 +324,7 @@ public class SimulatorMain extends JPanel {
                 } else {
                     selectedRows.add(row);
                     idLabel.setBorder(BorderFactory.createCompoundBorder(
-                        new LineBorder(branding.light, 3, true),
+                        new LineBorder(labelColor.brighter().brighter().brighter(), 6),
                         new EmptyBorder(7, 7, 7, 7)
                     ));
                 }
@@ -369,7 +369,7 @@ public class SimulatorMain extends JPanel {
                 g2.setColor(getBackground());
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, getHeight(), getHeight());
                 g2.dispose();
                 super.paintComponent(g);
@@ -420,7 +420,7 @@ public class SimulatorMain extends JPanel {
                 g2.setColor(getBackground());
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 14, 14);
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 14, 14);
                 g2.dispose();
                 super.paintComponent(g);
@@ -471,7 +471,7 @@ public class SimulatorMain extends JPanel {
         field.setBackground(branding.dark);
         field.setCaretColor(branding.light);
         field.setBorder(BorderFactory.createCompoundBorder(
-            new LineBorder(branding.light, 1, true),
+            new LineBorder(branding.light, 2, true),
             new EmptyBorder(6, 10, 6, 10)
         ));
     }
@@ -504,11 +504,11 @@ public class SimulatorMain extends JPanel {
     }
 
     public String generateProcessId() {
-        String chars = "abcdefghijklmnopqrstuvwxyz";
+        String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String id;
         do {
-            StringBuilder sb = new StringBuilder("P_");
-            for (int i = 0; i < 3; i++) {
+            StringBuilder sb = new StringBuilder("P:");
+            for (int i = 0; i < 2; i++) {
                 sb.append(chars.charAt((int)(Math.random() * chars.length())));
             }
             id = sb.toString();
@@ -953,7 +953,12 @@ public class SimulatorMain extends JPanel {
     
     public void refreshStyles() {
         styleComboBox(algorithmComboBox);
-        styleTextField(quantumTimeField);
+        updateAlgorithmFields();
+
+        addProcessBtn.setIcon(branding.lightIcoAddProcess);
+        removeProcessBtn.setIcon(branding.lightIcoRemoveProcess);
+        importTextFileBtn.setIcon(branding.lightIcoImportProcess);
+        randomProcessesBtn.setIcon(branding.lightIcoRandomProcess);
 
         for (java.awt.Component comp : processTablePanel.getComponents()) {
             if (comp instanceof JPanel) {

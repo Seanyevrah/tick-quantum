@@ -28,17 +28,16 @@ public class MainMenuHowToUse extends JPanel {
 
         initializeMainPanel();
     }
-
-    // ── Layout ────────────────────────────────────────────────────────────
-    private void initializeMainPanel() {
-        JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.setOpaque(false);
+    
+    public void initializeMainPanel() {
+        JPanel margin = new JPanel(new BorderLayout());
+        margin.setOpaque(false);
 
         int m = 40;
-        wrapper.add(blankPanel(m, 0, false), BorderLayout.NORTH);
-        wrapper.add(blankPanel(m, 0, false), BorderLayout.SOUTH);
-        wrapper.add(blankPanel(0, m, true),  BorderLayout.WEST);
-        wrapper.add(blankPanel(0, m, true),  BorderLayout.EAST);
+        margin.add(blankPanel(m, 0, false), BorderLayout.NORTH);
+        margin.add(blankPanel(m, 0, false), BorderLayout.SOUTH);
+        margin.add(blankPanel(0, m, true),  BorderLayout.WEST);
+        margin.add(blankPanel(0, m, true),  BorderLayout.EAST);
 
         JPanel container = new JPanel(null) {
             @Override
@@ -48,7 +47,7 @@ public class MainMenuHowToUse extends JPanel {
                 g2.setColor(branding.dark);
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 18, 18);
                 g2.dispose();
             }
@@ -57,7 +56,6 @@ public class MainMenuHowToUse extends JPanel {
 
         buildContent(container);
 
-        // Reposition everything whenever the container is resized
         container.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -65,12 +63,11 @@ public class MainMenuHowToUse extends JPanel {
             }
         });
 
-        wrapper.add(container, BorderLayout.CENTER);
-        add(wrapper, BorderLayout.CENTER);
+        margin.add(container, BorderLayout.CENTER);
+        add(margin, BorderLayout.CENTER);
     }
-
-    // ── Build (create & add components once) ─────────────────────────────
-    private void buildContent(JPanel c) {
+    
+    public void buildContent(JPanel c) {
         titleLabel = new JLabel("How To Use", SwingConstants.CENTER);
         titleLabel.setFont(branding.jetBrainsBExtraLarge);
         titleLabel.setForeground(branding.light);
@@ -110,7 +107,7 @@ public class MainMenuHowToUse extends JPanel {
                 g2.setColor(getBackground());
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
                 g2.setColor(branding.light);
-                g2.setStroke(new BasicStroke(1.5f));
+                g2.setStroke(new BasicStroke(3f));
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, getHeight(), getHeight());
                 g2.dispose();
                 super.paintComponent(g);
@@ -150,68 +147,50 @@ public class MainMenuHowToUse extends JPanel {
         });
         c.add(backButton);
     }
-
-    // ── Reposition (called on every resize) ───────────────────────────────
-    private void repositionContent(int W, int H) {
-        int pad   = (int) (W * 0.04);   // ~4 % side padding
+    
+    public void repositionContent(int W, int H) {
+        int pad = (int) (W * 0.04);
         int titleH = (int) (H * 0.09);
+        
+        int leftW = (int) (W * 0.26);
+        int midX = (int) (W * 0.30);
+        int midW = (int) (W * 0.48);
+        int rightX = (int) (W * 0.79);
+        int rightW = W - rightX - pad;
 
-        // ── Column X boundaries ───────────────────────────────────────────
-        // Left column  : pad … 28 % W
-        // Middle column: 30 % … 78 % W
-        // Right column : 80 % … (W - pad)
-        int leftW   = (int) (W * 0.26);
-        int midX    = (int) (W * 0.30);
-        int midW    = (int) (W * 0.48);
-        int rightX  = (int) (W * 0.79);
-        int rightW  = W - rightX - pad;
-
-        // ── Row Y boundaries ─────────────────────────────────────────────
-        int topRowY = titleH;                          // images start here
-        int topRowH = (int) (H * 0.50);               // top half height
-        int botRowY = (int) (H * 0.56);               // bottom half starts
+        int topRowY = titleH;
+        int topRowH = (int) (H * 0.50);
+        int botRowY = (int) (H * 0.56);
         int botRowH = H - botRowY - pad;
 
         int btnW = 200, btnH = 48;
-
-        // Title — centered across full width
+        
         titleLabel.setBounds(0, (int)(titleH * 0.1), W, (int)(titleH * 0.8));
-
-        // LEFT COLUMN
+        
         algoDesc.setBounds(pad, topRowY, leftW, (int)(H * 0.12));
-        algoImage.setBounds(pad + (int)(leftW * 0.1), topRowY + (int)(H * 0.13),
-                            (int)(leftW * 0.85), (int)(topRowH * 0.62));
+        algoImage.setBounds(pad + (int)(leftW * 0.1), topRowY + (int)(H * 0.13), (int)(leftW * 0.85), (int)(topRowH * 0.62));
         outputDesc.setBounds(pad, botRowY, leftW, (int)(H * 0.14));
-
-        // MIDDLE COLUMN
+        
         int tableLabelH = (int)(H * 0.05);
         tableTitleLabel.setBounds(midX, topRowY, midW, tableLabelH);
         tableImage.setBounds(midX, topRowY + tableLabelH + 4, midW, (int)(topRowH * 0.48));
-        removeHint.setBounds(midX, topRowY + tableLabelH + 4 + (int)(topRowH * 0.48) + 8,
-                             (int)(midW * 0.68), (int)(H * 0.18));
-
-        // RIGHT COLUMN
+        removeHint.setBounds(midX, topRowY + tableLabelH + 4 + (int)(topRowH * 0.48) + 8, (int)(midW * 0.68), (int)(H * 0.18));
+        
         buttonsImage.setBounds(rightX, topRowY, rightW, topRowH);
-
-        // BOTTOM RIGHT — output preview
-        outputImage.setBounds(midX + (int)(midW * 0.38), botRowY,
-                              W - (midX + (int)(midW * 0.38)) - pad, botRowH);
-
-        // BOTTOM LEFT — back button pinned to lower-left inside container
+        
+        outputImage.setBounds(midX + (int)(midW * 0.38), botRowY, W - (midX + (int)(midW * 0.38)) - pad, botRowH);
         backButton.setBounds(pad, H - btnH - pad, btnW, btnH);
     }
-
-    // ── Helpers ───────────────────────────────────────────────────────────
-
-    private JPanel blankPanel(int height, int width, boolean isHorizontal) {
+    
+    public JPanel blankPanel(int height, int width, boolean isHorizontal) {
         JPanel p = new JPanel();
         p.setOpaque(false);
         if (isHorizontal) p.setPreferredSize(new Dimension(width, 0));
-        else              p.setPreferredSize(new Dimension(0, height));
+        else p.setPreferredSize(new Dimension(0, height));
         return p;
     }
 
-    private JTextArea makeText(String t) {
+    public JTextArea makeText(String t) {
         JTextArea ta = new JTextArea(t);
         ta.setFont(branding.jetBrainsBMedium);
         ta.setForeground(branding.light);
@@ -223,7 +202,7 @@ public class MainMenuHowToUse extends JPanel {
         return ta;
     }
 
-    private JPanel makeImagePanel(Image image, String fieldName) {
+    public JPanel makeImagePanel(Image image, String fieldName) {
         JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -237,12 +216,10 @@ public class MainMenuHowToUse extends JPanel {
                     int imgH = image.getHeight(this);
 
                     if (imgW > 0 && imgH > 0) {
-                        // Scale to fit inside the panel while preserving aspect ratio
                         double scale = Math.min((double) pw / imgW, (double) ph / imgH);
                         int drawW = (int) (imgW * scale);
                         int drawH = (int) (imgH * scale);
 
-                        // Center within the panel
                         int drawX = (pw - drawW) / 2;
                         int drawY = (ph - drawH) / 2;
 
