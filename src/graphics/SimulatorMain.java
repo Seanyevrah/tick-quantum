@@ -9,7 +9,6 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.border.*;
 import engine.MainEngine;
-import scheduler.*;
 import model.Process;
 
 public class SimulatorMain extends JPanel {
@@ -21,21 +20,20 @@ public class SimulatorMain extends JPanel {
     private JPanel leftPanel, rightPanel;
 
     // Left panel components
-    private JLabel algorithmLabel;
+    private JLabel algorithmLabel, quantumTimeLabel;
     private JComboBox<String> algorithmComboBox;
-    private JLabel quantumTimeLabel;
     private JTextField quantumTimeField;
-    private JButton simulateButton;
-    private JButton addProcessButton;
-    private JButton removeProcessButton;
-    private JButton importTextFileButton;
-    private JButton randomProcessesButton;
+    private JButton simulateBtn;
+    private JButton addProcessBtn, removeProcessBtn, importTextFileBtn, randomProcessesBtn;
 
     // Right panel components
     private JPanel processTablePanel;
-    private JLabel processIdHeader, burstTimeHeader, arrivalTimeHeader, priorityNoHeader;
+    private JLabel priorityNoHeader;
 
     private ArrayList<Process> processes = new ArrayList<>();
+    private Set<JPanel> selectedRows = new HashSet<>();
+    private Set<String> usedProcessIds = new HashSet<>();
+    private Set<Color> usedColors = new HashSet<>();
 
     public SimulatorMain(MainEngine mainEngine, Branding branding, JPanel parentContainer) {
         this.branding = branding;
@@ -99,12 +97,12 @@ public class SimulatorMain extends JPanel {
         leftPanel.setOpaque(false);
         leftPanel.setPreferredSize(new Dimension(350, 0));
 
-        JPanel content = new JPanel();
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setOpaque(false);
-        content.setBorder(new EmptyBorder(16, 16, 16, 16));
+        JPanel leftContent = new JPanel();
+        leftContent.setLayout(new BoxLayout(leftContent, BoxLayout.Y_AXIS));
+        leftContent.setOpaque(false);
+        leftContent.setBorder(new EmptyBorder(16, 16, 16, 16));
 
-        JPanel algorithmCard = new JPanel() {
+        JPanel algorithmPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -117,12 +115,12 @@ public class SimulatorMain extends JPanel {
                 g2.dispose();
             }
         };
-        algorithmCard.setOpaque(false);
-        algorithmCard.setLayout(new BoxLayout(algorithmCard, BoxLayout.Y_AXIS));
-        algorithmCard.setBorder(new EmptyBorder(16, 16, 16, 16));
-        algorithmCard.setAlignmentX(Component.LEFT_ALIGNMENT);
-        algorithmCard.setPreferredSize(new Dimension(getWidth(), 300));
-        algorithmCard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 240));
+        algorithmPanel.setOpaque(false);
+        algorithmPanel.setLayout(new BoxLayout(algorithmPanel, BoxLayout.Y_AXIS));
+        algorithmPanel.setBorder(new EmptyBorder(16, 16, 16, 16));
+        algorithmPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        algorithmPanel.setPreferredSize(new Dimension(getWidth(), 300));
+        algorithmPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 240));
 
         algorithmLabel = new JLabel("Algorithm");
         algorithmLabel.setFont(branding.jetBrainsBMedium);
@@ -153,13 +151,13 @@ public class SimulatorMain extends JPanel {
         quantumTimeField.setAlignmentX(Component.LEFT_ALIGNMENT);
         quantumTimeField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
 
-        simulateButton = createSimulateButton("Simulate");
+        simulateBtn = createOtherBtn("Simulate");
         JPanel simulateWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         simulateWrapper.setOpaque(false);
         simulateWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
         simulateWrapper.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        simulateWrapper.add(simulateButton);
-        simulateButton.addActionListener(e -> {
+        simulateWrapper.add(simulateBtn);
+        simulateBtn.addActionListener(e -> {
             if (!validateProcessTable()) return;
             
             String algorithm = (String) algorithmComboBox.getSelectedItem();
@@ -178,46 +176,46 @@ public class SimulatorMain extends JPanel {
             mainEngine.getGUI().getSimulatorOutput().loadSimulationResults();
         });
 
-        algorithmCard.add(algorithmLabel);
-        algorithmCard.add(Box.createVerticalStrut(8));
-        algorithmCard.add(algorithmComboBox);
-        algorithmCard.add(Box.createVerticalStrut(14));
-        algorithmCard.add(quantumTimeLabel);
-        algorithmCard.add(Box.createVerticalStrut(6));
-        algorithmCard.add(quantumTimeField);
-        algorithmCard.add(Box.createVerticalStrut(50));
-        algorithmCard.add(simulateWrapper);
+        algorithmPanel.add(algorithmLabel);
+        algorithmPanel.add(Box.createVerticalStrut(8));
+        algorithmPanel.add(algorithmComboBox);
+        algorithmPanel.add(Box.createVerticalStrut(14));
+        algorithmPanel.add(quantumTimeLabel);
+        algorithmPanel.add(Box.createVerticalStrut(6));
+        algorithmPanel.add(quantumTimeField);
+        algorithmPanel.add(Box.createVerticalStrut(50));
+        algorithmPanel.add(simulateWrapper);
 
-        JPanel actionsCard = new JPanel();
-        actionsCard.setOpaque(false);
-        actionsCard.setLayout(new BoxLayout(actionsCard, BoxLayout.Y_AXIS));
-        actionsCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setOpaque(false);
+        buttonsPanel.setLayout(new BoxLayout(buttonsPanel, BoxLayout.Y_AXIS));
+        buttonsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        addProcessButton = createActionButton("+ ",   "Add Process");
-        removeProcessButton = createActionButton("\u2014 ", "Remove Process");
-        importTextFileButton = createActionButton("\u21B5 ", "Import Text File");
-        randomProcessesButton = createActionButton("\u2684 ", "Random Processes");
+        addProcessBtn = createActionButton(branding.lightIcoAddProcess, "Add Process");
+        removeProcessBtn = createActionButton(branding.lightIcoRemoveProcess, "Remove Process");
+        importTextFileBtn = createActionButton(branding.lightIcoImportProcess, "Import Text File");
+        randomProcessesBtn = createActionButton(branding.lightIcoRandomProcess, "Random Processes");
 
-        addProcessButton.addActionListener(e -> addProcess());
-        removeProcessButton.addActionListener(e -> removeProcess());
-        randomProcessesButton.addActionListener(e -> randomProcesses());
-        importTextFileButton.addActionListener(e -> importFromFile());
+        addProcessBtn.addActionListener(e -> addProcess());
+        removeProcessBtn.addActionListener(e -> removeProcess());
+        randomProcessesBtn.addActionListener(e -> randomProcesses());
+        importTextFileBtn.addActionListener(e -> importFromFile());
 
-        actionsCard.add(addProcessButton);
-        actionsCard.add(Box.createVerticalStrut(20));
-        actionsCard.add(removeProcessButton);
-        actionsCard.add(Box.createVerticalStrut(20));
-        actionsCard.add(importTextFileButton);
-        actionsCard.add(Box.createVerticalStrut(20));
-        actionsCard.add(randomProcessesButton);
-        actionsCard.add(Box.createVerticalGlue());
+        buttonsPanel.add(addProcessBtn);
+        buttonsPanel.add(Box.createVerticalStrut(20));
+        buttonsPanel.add(removeProcessBtn);
+        buttonsPanel.add(Box.createVerticalStrut(20));
+        buttonsPanel.add(importTextFileBtn);
+        buttonsPanel.add(Box.createVerticalStrut(20));
+        buttonsPanel.add(randomProcessesBtn);
+        buttonsPanel.add(Box.createVerticalGlue());
         
-        content.add(algorithmCard);
-        content.add(Box.createVerticalStrut(20));
-        content.add(actionsCard);
-        content.add(Box.createVerticalGlue());
+        leftContent.add(algorithmPanel);
+        leftContent.add(Box.createVerticalStrut(20));
+        leftContent.add(buttonsPanel);
+        leftContent.add(Box.createVerticalGlue());
 
-        leftPanel.add(content, BorderLayout.CENTER);
+        leftPanel.add(leftContent, BorderLayout.CENTER);
     }
     
     public void initializeRightPanel() {
@@ -256,38 +254,49 @@ public class SimulatorMain extends JPanel {
         processTablePanel.setOpaque(false);
         processTablePanel.setBorder(new EmptyBorder(0, 20, 20, 20));
 
-        processTablePanel.add(createProcessRow("P1", branding.processColor[0], "2", "0", false));
-        processTablePanel.add(Box.createVerticalStrut(20));
-        processTablePanel.add(createProcessRow("P2", branding.processColor[1], "2", "2", false));
-        processTablePanel.add(Box.createVerticalStrut(20));
-        processTablePanel.add(createProcessRow("P3", branding.processColor[2], "2", "4", false));
+        String initId1 = generateProcessId(); usedProcessIds.add(initId1);
+        String initId2 = generateProcessId(); usedProcessIds.add(initId2);
+        String initId3 = generateProcessId(); usedProcessIds.add(initId3);
+        Color initC1 = nextProcessColor();
+        Color initC2 = nextProcessColor();
+        Color initC3 = nextProcessColor();
 
-        Process p1 = new Process("P1", branding.processColor[0], 0, 2, 1);
-        Process p2 = new Process("P2", branding.processColor[0], 2, 2, 2);
-        Process p3 = new Process("P3", branding.processColor[0], 4, 2, 3);
+        processTablePanel.add(createProcessRow(initId1, initC1, "2", "0", false));
+        processTablePanel.add(Box.createVerticalStrut(20));
+        processTablePanel.add(createProcessRow(initId2, initC2, "2", "2", false));
+        processTablePanel.add(Box.createVerticalStrut(20));
+        processTablePanel.add(createProcessRow(initId3, initC3, "2", "4", false));
+
+        Process p1 = new Process(initId1, initC1, 0, 2, 1);
+        Process p2 = new Process(initId2, initC2, 2, 2, 2);
+        Process p3 = new Process(initId3, initC3, 4, 2, 3);
 
         processes.add(p1);
         processes.add(p2);
         processes.add(p3);
 
-        JPanel topContent = new JPanel(new BorderLayout());
-        topContent.setOpaque(false); 
-        topContent.add(headerRow, BorderLayout.NORTH);
+        JPanel topleftContent = new JPanel(new BorderLayout());
+        topleftContent.setOpaque(false); 
+        topleftContent.add(headerRow, BorderLayout.NORTH);
         JScrollPane scrollPane = new JScrollPane(processTablePanel,
         JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
         JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(null);
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
-        topContent.add(scrollPane, BorderLayout.CENTER);
+        topleftContent.add(scrollPane, BorderLayout.CENTER);
 
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 14));
         footer.setOpaque(false);
-        JButton backToMenuButton = createSimulateButton("Back To Menu");
+        JButton backToMenuButton = createOtherBtn("Back To Menu");
         backToMenuButton.setPreferredSize(new Dimension(190, 44));
+        backToMenuButton.addActionListener(e -> {
+            CardLayout cl = (CardLayout) parentContainer.getLayout();
+            cl.show(parentContainer, "MainMenu");
+        });
         footer.add(backToMenuButton);
 
-        wrapper.add(topContent, BorderLayout.CENTER);
+        wrapper.add(topleftContent, BorderLayout.CENTER);
         wrapper.add(footer, BorderLayout.SOUTH);
 
         rightPanel.add(wrapper, BorderLayout.CENTER);
@@ -305,6 +314,22 @@ public class SimulatorMain extends JPanel {
         idLabel.setOpaque(true);
         idLabel.setBackground(labelColor);
         idLabel.setBorder(new LineBorder(labelColor, 10));
+        idLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        idLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (selectedRows.contains(row)) {
+                    selectedRows.remove(row);
+                    idLabel.setBorder(new LineBorder(labelColor, 10));
+                } else {
+                    selectedRows.add(row);
+                    idLabel.setBorder(BorderFactory.createCompoundBorder(
+                        new LineBorder(branding.light, 3, true),
+                        new EmptyBorder(7, 7, 7, 7)
+                    ));
+                }
+            }
+        });
         
         JTextField burstField = new JTextField(burst);
         styleTextField(burstField);
@@ -335,13 +360,13 @@ public class SimulatorMain extends JPanel {
         return lbl;
     }
     
-    public JButton createSimulateButton(String text) {
+    public JButton createOtherBtn(String text) {
         JButton btn = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(branding.dark);
+                g2.setColor(getBackground());
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), getHeight(), getHeight());
                 g2.setColor(branding.light);
                 g2.setStroke(new BasicStroke(1.5f));
@@ -352,6 +377,7 @@ public class SimulatorMain extends JPanel {
         };
         btn.setFont(branding.jetBrainsBMedium);
         btn.setForeground(branding.light);
+        btn.setBackground(branding.dark);
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
@@ -359,16 +385,39 @@ public class SimulatorMain extends JPanel {
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
         btn.setPreferredSize(new Dimension(160, 44));
         btn.setMaximumSize(new Dimension(200, 44));
+
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btn.setBackground(branding.darkGray);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btn.setBackground(branding.dark);
+            }
+
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                btn.setBackground(branding.darkGray);
+            }
+
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                btn.setBackground(branding.darkGray);
+            }
+        });
+
         return btn;
     }
     
-    public JButton createActionButton(String icon, String text) {
-        JButton btn = new JButton(icon + text) {
+    public JButton createActionButton(ImageIcon icon, String text) {
+        JButton btn = new JButton(text, icon) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(branding.dark);
+                g2.setColor(getBackground());
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 14, 14);
                 g2.setColor(branding.light);
                 g2.setStroke(new BasicStroke(1.5f));
@@ -389,6 +438,30 @@ public class SimulatorMain extends JPanel {
         btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 62));
         btn.setPreferredSize(new Dimension(350, 62));
         btn.setBorder(new EmptyBorder(0, 20, 0, 20));
+        btn.setBackground(branding.dark);
+
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btn.setBackground(branding.darkGray);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btn.setBackground(branding.dark);
+            }
+
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                btn.setBackground(branding.darkGray);
+            }
+
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                btn.setBackground(branding.darkGray);
+            }
+        });
+
         return btn;
     }
 
@@ -430,14 +503,38 @@ public class SimulatorMain extends JPanel {
         return p;
     }
 
-    public void addProcess() {
-        int currentCount = processTablePanel.getComponentCount() / 2 + 2;
-        if (currentCount > 20) return;
+    public String generateProcessId() {
+        String chars = "abcdefghijklmnopqrstuvwxyz";
+        String id;
+        do {
+            StringBuilder sb = new StringBuilder("P_");
+            for (int i = 0; i < 3; i++) {
+                sb.append(chars.charAt((int)(Math.random() * chars.length())));
+            }
+            id = sb.toString();
+        } while (usedProcessIds.contains(id));
+        return id;
+    }
 
-        String id = "P" + currentCount;
-        Color color = new Color((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255));
-        
-        // Determine if priority column should be enabled
+    public Color nextProcessColor() {
+        for (Color c : branding.processColor) {
+            if (!usedColors.contains(c)) {
+                usedColors.add(c);
+                return c;
+            }
+        }
+        // Fallback: all 20 colors in use, pick the first one (shouldn't happen, max 20 processes)
+        return branding.processColor[0];
+    }
+
+    public void addProcess() {
+        long currentCount = java.util.Arrays.stream(processTablePanel.getComponents())
+            .filter(c -> c instanceof JPanel).count();
+        if (currentCount >= 20) return;
+
+        String id = generateProcessId();
+        usedProcessIds.add(id);
+        Color color = nextProcessColor();
         boolean priorityEnabled = isPriorityAlgorithm();
 
         JPanel newRow = createProcessRow(id, color, "1", "0", priorityEnabled);
@@ -448,17 +545,64 @@ public class SimulatorMain extends JPanel {
     }
 
     public void removeProcess() {
-        int rowCount = processTablePanel.getComponentCount();
-        if (rowCount <= 5) return;
+        if (selectedRows.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Please select a process by clicking on its Process ID label.",
+                "No Process Selected", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
 
-        processTablePanel.remove(rowCount - 1);
-        processTablePanel.remove(rowCount - 2);
+        // Count non-strut rows currently in the panel
+        long totalRows = java.util.Arrays.stream(processTablePanel.getComponents())
+            .filter(c -> c instanceof JPanel).count();
+
+        if (totalRows - selectedRows.size() < 3) {
+            JOptionPane.showMessageDialog(this,
+                "At least three processes must remain.",
+                "Cannot Remove", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Collect components to remove: selected rows + their adjacent struts
+        java.util.List<Component> toRemove = new ArrayList<>();
+        Component[] comps = processTablePanel.getComponents();
+        for (int i = 0; i < comps.length; i++) {
+            if (selectedRows.contains(comps[i])) {
+                toRemove.add(comps[i]);
+                // Remove the strut before this row (if any)
+                if (i > 0 && !(comps[i - 1] instanceof JPanel)) {
+                    toRemove.add(comps[i - 1]);
+                }
+                // Or the strut after this row if it's the first component
+                else if (i == 0 && i + 1 < comps.length && !(comps[i + 1] instanceof JPanel)) {
+                    toRemove.add(comps[i + 1]);
+                }
+            }
+        }
+
+        // Free the IDs and colors of removed rows
+        for (Component c : toRemove) {
+            if (c instanceof JPanel) {
+                JPanel row = (JPanel) c;
+                Component first = row.getComponent(0);
+                if (first instanceof JLabel) {
+                    usedProcessIds.remove(((JLabel) first).getText());
+                    usedColors.remove(((JLabel) first).getBackground());
+                }
+            }
+            processTablePanel.remove(c);
+        }
+
+        selectedRows.clear();
         processTablePanel.revalidate();
         processTablePanel.repaint();
     }
 
     public void randomProcesses() {
         processTablePanel.removeAll();
+        usedProcessIds.clear();
+        usedColors.clear();
+        selectedRows.clear();
 
         int processCount = 3 + (int)(Math.random() * 18); // 3–20 processes
         boolean priorityEnabled = isPriorityAlgorithm();
@@ -472,7 +616,8 @@ public class SimulatorMain extends JPanel {
         }
 
         for (int i = 0; i < processCount; i++) {
-            String id = "P" + (i + 1);
+            String id = generateProcessId();
+            usedProcessIds.add(id);
 
             // Burst: 1–30
             String burst = String.valueOf(1 + (int)(Math.random() * 30));
@@ -480,7 +625,7 @@ public class SimulatorMain extends JPanel {
             // Arrival: 0–30
             String arrival = String.valueOf((int)(Math.random() * 31));
 
-            Color color = branding.processColor[i % branding.processColor.length];
+            Color color = nextProcessColor();
 
             JPanel row = createProcessRow(id, color, burst, arrival, priorityEnabled);
 
@@ -506,20 +651,176 @@ public class SimulatorMain extends JPanel {
     }
 
     public void importFromFile() {
-        JOptionPane.showMessageDialog(this, "Import functionality not implemented yet.");
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Import Processes from Text File");
+        chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Text files (*.txt)", "txt"));
+        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+        java.io.File file = chooser.getSelectedFile();
+        java.util.List<String[]> rows = new java.util.ArrayList<>();
+        boolean hasPriority = false;
+
+        try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file))) {
+            String line;
+            int lineNumber = 0;
+            Boolean expectsPriority = null;
+
+            while ((line = br.readLine()) != null) {
+                lineNumber++;
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#")) continue;
+
+                String[] parts = line.split(",");
+                if (parts.length < 2 || parts.length > 3) {
+                    JOptionPane.showMessageDialog(this,
+                        "Line " + lineNumber + ": expected 2 or 3 comma-separated values, got " + parts.length + ".",
+                        "Import Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                boolean rowHasPriority = (parts.length == 3);
+                if (expectsPriority == null) {
+                    expectsPriority = rowHasPriority;
+                } else if (expectsPriority != rowHasPriority) {
+                    JOptionPane.showMessageDialog(this,
+                        "Line " + lineNumber + ": inconsistent columns — some rows have priority and others do not.",
+                        "Import Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                int burst;
+                try { burst = Integer.parseInt(parts[0].trim()); }
+                catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this,
+                        "Line " + lineNumber + ": burst time \"" + parts[0].trim() + "\" is not an integer.",
+                        "Import Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (burst < 1 || burst > 30) {
+                    JOptionPane.showMessageDialog(this,
+                        "Line " + lineNumber + ": burst time must be between 1 and 30 (got " + burst + ").",
+                        "Import Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                int arrival;
+                try { arrival = Integer.parseInt(parts[1].trim()); }
+                catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this,
+                        "Line " + lineNumber + ": arrival time \"" + parts[1].trim() + "\" is not an integer.",
+                        "Import Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (arrival < 0 || arrival > 30) {
+                    JOptionPane.showMessageDialog(this,
+                        "Line " + lineNumber + ": arrival time must be between 0 and 30 (got " + arrival + ").",
+                        "Import Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (rowHasPriority) {
+                    int priority;
+                    try { priority = Integer.parseInt(parts[2].trim()); }
+                    catch (NumberFormatException e) {
+                        JOptionPane.showMessageDialog(this,
+                            "Line " + lineNumber + ": priority \"" + parts[2].trim() + "\" is not an integer.",
+                            "Import Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (priority < 1 || priority > 20) {
+                        JOptionPane.showMessageDialog(this,
+                            "Line " + lineNumber + ": priority must be between 1 and 20 (got " + priority + ").",
+                            "Import Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+
+                rows.add(parts);
+                if (rows.size() > 20) {
+                    JOptionPane.showMessageDialog(this,
+                        "File contains more than 20 processes (maximum is 20).",
+                        "Import Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+        } catch (java.io.IOException e) {
+            JOptionPane.showMessageDialog(this,
+                "Could not read file: " + e.getMessage(),
+                "Import Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (rows.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "File contains no process data.",
+                "Import Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        hasPriority = rows.get(0).length == 3;
+
+        if (hasPriority) {
+            java.util.Set<Integer> seen = new java.util.HashSet<>();
+            for (int i = 0; i < rows.size(); i++) {
+                int p = Integer.parseInt(rows.get(i)[2].trim());
+                if (!seen.add(p)) {
+                    JOptionPane.showMessageDialog(this,
+                        "Duplicate priority value " + p + " at process " + (i + 1) + ". Priorities must be unique.",
+                        "Import Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+        }
+
+        boolean algoPriority = isPriorityAlgorithm();
+        if (hasPriority && !algoPriority) {
+            JOptionPane.showMessageDialog(this,
+                "The file contains priority values but the selected algorithm does not use priority.\nPriority column will be ignored.",
+                "Warning", JOptionPane.WARNING_MESSAGE);
+        }
+
+        processTablePanel.removeAll();
+        processes.clear();
+        usedProcessIds.clear();
+        usedColors.clear();
+        selectedRows.clear();
+
+        for (int i = 0; i < rows.size(); i++) {
+            String[] parts = rows.get(i);
+            String id    = generateProcessId();
+            usedProcessIds.add(id);
+            Color  color = nextProcessColor();
+            int    burst   = Integer.parseInt(parts[0].trim());
+            int    arrival = Integer.parseInt(parts[1].trim());
+
+            JPanel row = createProcessRow(id, color, String.valueOf(burst), String.valueOf(arrival), algoPriority);
+
+            if (algoPriority && hasPriority) {
+                JTextField priorityField = (JTextField) row.getComponent(3);
+                priorityField.setText(parts[2].trim());
+                styleProcessField(priorityField, true);
+            }
+
+            processTablePanel.add(row);
+            if (i < rows.size() - 1) processTablePanel.add(Box.createVerticalStrut(20));
+
+            processes.add(new model.Process(id, color, arrival, burst, i + 1));
+        }
+
+        processTablePanel.revalidate();
+        processTablePanel.repaint();
     }
 
-    private boolean isPriorityAlgorithm() {
+    public boolean isPriorityAlgorithm() {
         String algo = (String) algorithmComboBox.getSelectedItem();
         return algo.contains("Priority");
     }
 
-    private boolean isRoundRobinAlgorithm() {
+    public boolean isRoundRobinAlgorithm() {
         String algo = (String) algorithmComboBox.getSelectedItem();
         return algo.contains("Round Robin");
     }
 
-    private void updateAlgorithmFields() {
+    public void updateAlgorithmFields() {
         boolean roundRobin = isRoundRobinAlgorithm();
         boolean priority = isPriorityAlgorithm();
 
@@ -537,7 +838,7 @@ public class SimulatorMain extends JPanel {
         }
     }
 
-    private void styleProcessField(JTextField field, boolean enabled) {
+    public void styleProcessField(JTextField field, boolean enabled) {
         field.setEnabled(enabled);
         field.setBackground(branding.dark);
         field.setForeground(enabled ? branding.light : branding.darkGray);
@@ -548,7 +849,7 @@ public class SimulatorMain extends JPanel {
         ));
     }
     
-    private void styleHeaderLabel(JLabel label, boolean enabled) {
+    public void styleHeaderLabel(JLabel label, boolean enabled) {
         label.setForeground(enabled ? branding.light : branding.darkGray);
     }
 
@@ -579,7 +880,7 @@ public class SimulatorMain extends JPanel {
             JTextField arrivalField = (JTextField) fields[2];
             JTextField priorityField = (JTextField) fields[3];
 
-            // ---- Burst ----
+            // Burst
             if (!isInteger(burstField.getText())) {
                 showValidationError("Burst Time must be an integer.");
                 return false;
@@ -591,7 +892,7 @@ public class SimulatorMain extends JPanel {
                 return false;
             }
 
-            // ---- Arrival ----
+            // Arrival
             if (!isInteger(arrivalField.getText())) {
                 showValidationError("Arrival Time must be an integer.");
                 return false;
@@ -603,7 +904,7 @@ public class SimulatorMain extends JPanel {
                 return false;
             }
 
-            // ---- Priority ----
+            // Priority
             if (priorityField.isEnabled()) {
                 if (!isInteger(priorityField.getText())) {
                     showValidationError("Priority must be an integer.");
@@ -627,11 +928,11 @@ public class SimulatorMain extends JPanel {
         return true;
     }
 
-    private void showValidationError(String message) {
+    public void showValidationError(String message) {
         JOptionPane.showMessageDialog(this, message, "Invalid Input", JOptionPane.ERROR_MESSAGE);
     }
 
-    private boolean isInteger(String str) {
+    public boolean isInteger(String str) {
         if (str == null || str.isEmpty()) return false;
         try {
             Integer.parseInt(str);
@@ -649,4 +950,29 @@ public class SimulatorMain extends JPanel {
     public ArrayList<Process> getProcesses() {
         return this.processes;
     }
+    
+    public void refreshStyles() {
+        styleComboBox(algorithmComboBox);
+        styleTextField(quantumTimeField);
+
+        for (java.awt.Component comp : processTablePanel.getComponents()) {
+            if (comp instanceof JPanel) {
+                JPanel row = (JPanel) comp;
+                row.setBackground(branding.dark);
+                for (int i = 1; i < row.getComponentCount(); i++) {
+                    java.awt.Component c = row.getComponent(i);
+                    if (c instanceof JTextField) {
+                        JTextField tf = (JTextField) c;
+                        boolean enabled = tf.isEnabled();
+                        if (i == 3) {
+                            styleProcessField(tf, enabled);
+                        } else {
+                            styleTextField(tf);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

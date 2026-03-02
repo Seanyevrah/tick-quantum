@@ -7,7 +7,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import engine.MainEngine;
-import graphics.Branding;
 
 public class MainGUI {
     public Branding branding;
@@ -15,6 +14,9 @@ public class MainGUI {
     private JFrame mainFrame;
     private JPanel mainPanel;
 
+    private MainMenu mainMenu;
+    private MainMenuHowToUse mainMenuHowToUse;
+    private MainMenuSettings mainMenuSettings;
     private SimulatorMain simulatorMain;
     private SimulatorOutput simulatorOutput;
 
@@ -42,14 +44,51 @@ public class MainGUI {
         mainPanel.setBackground(branding.dark);
         mainPanel.setLayout(new CardLayout());
         
+        mainMenu = new MainMenu(engine, branding, mainPanel);
+        mainMenuHowToUse = new MainMenuHowToUse(engine, branding, mainPanel);
+        mainMenuSettings = new MainMenuSettings(engine, branding, mainPanel);
+        mainMenuSettings.setThemeChangeListener(this::applyTheme);
         simulatorMain = new SimulatorMain(engine, branding, mainPanel);
         simulatorOutput = new SimulatorOutput(engine, branding, mainPanel);
         
+        mainPanel.add(mainMenu, "MainMenu");
+        mainPanel.add(mainMenuHowToUse, "HowToUse");
+        mainPanel.add(mainMenuSettings, "Settings");
         mainPanel.add(simulatorMain, "SimulatorMain");
         mainPanel.add(simulatorOutput, "SimulatorOutput");
         mainFrame.add(mainPanel);
     }
 
+
+    // ==================================================
+    //                   THEME
+    // ==================================================
+    public void applyTheme() {
+        applyThemeRecursive(mainPanel);
+        simulatorMain.refreshStyles();
+        simulatorOutput.refreshStyles();
+        mainMenu.refreshIcons();
+        mainPanel.repaint();
+    }
+
+    private void applyThemeRecursive(java.awt.Container parent) {
+        for (java.awt.Component c : parent.getComponents()) {
+            java.awt.Color bg = c.getBackground();
+            if (bg != null) {
+                if (bg.equals(branding.dark) || bg.equals(branding.light)) {
+                    c.setBackground(branding.dark);
+                }
+            }
+            
+            java.awt.Color fg = c.getForeground();
+            if (fg != null && (fg.equals(branding.dark) || fg.equals(branding.light))) {
+                c.setForeground(branding.light);
+            }
+            if (c instanceof java.awt.Container) {
+                applyThemeRecursive((java.awt.Container) c);
+            }
+        }
+    }
 
     // ==================================================
     //                GETTERS AND SETTERS

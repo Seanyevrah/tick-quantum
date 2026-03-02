@@ -15,38 +15,94 @@ import javax.swing.ImageIcon;
 public class Branding {
     public Font jetBrainsBExtraSmall, jetBrainsBSmall, jetBrainsBMedium, jetBrainsBLarge, jetBrainsBExtraLarge, jetBrainsBGiant;
     public Font jetBrainsRExtraSmall, jetBrainsRSmall, jetBrainsRMedium, jetBrainsRLarge, jetBrainsRExtraLarge, jetBrainsRGiant;
-    public ImageIcon icoSimulate, icoHowToUse, icoSettings, icoExit;
-    public ImageIcon icoAddProcess, icoRemoveProcess, icoImportProcess, icoRandomProcess;
+    public ImageIcon lightIcoSimulate, lightIcoHowToUse, lightIcoSettings, lightIcoExit;
+    public ImageIcon lightIcoAddProcess, lightIcoRemoveProcess, lightIcoImportProcess, lightIcoRandomProcess;
+    public ImageIcon darkIcoSimulate, darkIcoHowToUse, darkIcoSettings, darkIcoExit;
+    public ImageIcon darkIcoAddProcess, darkIcoRemoveProcess, darkIcoImportProcess, darkIcoRandomProcess;
+    public Image backgroundDark, backgroundLight;
+    public Image howToUseAlgo, howToUseInput, howToUseButtons, howToUseOutput;
 
     public Branding() {
         initializeFonts();
+        initializeIcons();
         initializeImages();
     }
 
     public Color dark = Color.decode("#09090B");
     public Color light = Color.decode("#ffffff");
-    public Color darkGray = Color.decode("#696969");
+    public Color darkGray = Color.decode("#2e2e2e");
+    public Color lightGray = Color.decode("#d1d1d1");
+
+    public boolean isDark = true;
+    public void toggleTheme() {
+        Color tmpColor = dark;
+        dark = light;
+        light = tmpColor;
+
+        Color tmpHover = darkGray;
+        darkGray = lightGray;
+        lightGray = tmpHover;
+
+        Image tmpBg = backgroundDark;
+        backgroundDark = backgroundLight;
+        backgroundLight = tmpBg;
+
+        ImageIcon tmpSim = darkIcoSimulate;
+        darkIcoSimulate = lightIcoSimulate;
+        lightIcoSimulate = tmpSim;
+
+        ImageIcon tmpHow = darkIcoHowToUse;
+        darkIcoHowToUse = lightIcoHowToUse;
+        lightIcoHowToUse = tmpHow;
+
+        ImageIcon tmpSet = darkIcoSettings;
+        darkIcoSettings = lightIcoSettings;
+        lightIcoSettings = tmpSet;
+
+        ImageIcon tmpExit = darkIcoExit;
+        darkIcoExit = lightIcoExit;
+        lightIcoExit = tmpExit;
+
+        ImageIcon tmpAdd = darkIcoAddProcess;
+        darkIcoAddProcess = lightIcoAddProcess;
+        lightIcoAddProcess = tmpAdd;
+
+        ImageIcon tmpRemove = darkIcoRemoveProcess;
+        darkIcoRemoveProcess = lightIcoRemoveProcess;
+        lightIcoRemoveProcess = tmpRemove;
+
+        ImageIcon tmpImport = darkIcoImportProcess;
+        darkIcoImportProcess = lightIcoImportProcess;
+        lightIcoImportProcess = tmpImport;
+
+        ImageIcon tmpRandom = darkIcoRandomProcess;
+        darkIcoRandomProcess = lightIcoRandomProcess;
+        lightIcoRandomProcess = tmpRandom;
+
+        isDark = !isDark;
+    }
+
     public Color[] processColor = {
-        Color.decode("#E53935"),
-        Color.decode("#D81B60"),
-        Color.decode("#8E24AA"),
-        Color.decode("#5E35B1"),
-        Color.decode("#3949AB"),
-        Color.decode("#1E88E5"),
-        Color.decode("#039BE5"),
-        Color.decode("#00ACC1"),
-        Color.decode("#00897B"),
-        Color.decode("#43A047"),
-        Color.decode("#7CB342"),
-        Color.decode("#C0CA33"),
-        Color.decode("#FDD835"),
-        Color.decode("#FFB300"),
-        Color.decode("#FB8C00"),
-        Color.decode("#F4511E"),
-        Color.decode("#6D4C41"),
-        Color.decode("#546E7A"),
-        Color.decode("#EC407A"),
-        Color.decode("#7E57C2")
+        Color.decode("#E6194B"),
+        Color.decode("#2ECC71"),
+        Color.decode("#4363D8"),
+        Color.decode("#F58231"),
+        Color.decode("#9B59B6"),
+        Color.decode("#1ABC9C"),
+        Color.decode("#E91E8C"),
+        Color.decode("#CDDC39"),
+        Color.decode("#00BCD4"),
+        Color.decode("#FF5722"),
+        Color.decode("#3F51B5"),
+        Color.decode("#8BC34A"),
+        Color.decode("#FF9800"),
+        Color.decode("#795548"),
+        Color.decode("#9C27B0"),
+        Color.decode("#009688"),
+        Color.decode("#F06292"),
+        Color.decode("#607D8B"),
+        Color.decode("#FFEB3B"),
+        Color.decode("#76FF03")
     };
 
     public void initializeFonts() {
@@ -59,7 +115,7 @@ public class Branding {
             jetBrainsBMedium = jetBrainsB.deriveFont(Font.BOLD, 16f);
             jetBrainsBLarge = jetBrainsB.deriveFont(Font.BOLD, 24f);
             jetBrainsBExtraLarge = jetBrainsB.deriveFont(Font.BOLD, 32f);
-            jetBrainsBGiant = jetBrainsB.deriveFont(Font.BOLD, 200f);
+            jetBrainsBGiant = jetBrainsB.deriveFont(Font.BOLD, 65f);
 
             Font jetBrainsR = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/assets/fonts/JetBrainsMono-Regular.ttf"));
             jetBrainsRExtraSmall = jetBrainsR.deriveFont(Font.BOLD, 10f);
@@ -67,34 +123,69 @@ public class Branding {
             jetBrainsRMedium = jetBrainsR.deriveFont(Font.BOLD, 16f);
             jetBrainsRLarge = jetBrainsR.deriveFont(Font.BOLD, 24f);
             jetBrainsRExtraLarge = jetBrainsR.deriveFont(Font.BOLD, 32f);
-            jetBrainsRGiant = jetBrainsR.deriveFont(Font.BOLD, 200f);
+            jetBrainsRGiant = jetBrainsR.deriveFont(Font.BOLD, 60f);
         } catch (FontFormatException | IOException e){
             System.err.println("Font failed to load.");
         }
     }
 
-    public void initializeImages(){
+    public void initializeIcons() {
+        System.out.println("Loading Icons...");
+        try {
+            BufferedImage buff_lightIcoSimulate = ImageIO.read(getClass().getResourceAsStream("/assets/icons/light-simulate.png"));
+            BufferedImage buff_lightIcoHowToUse = ImageIO.read(getClass().getResourceAsStream("/assets/icons/light-how_to_use.png"));
+            BufferedImage buff_lightIcoSettings = ImageIO.read(getClass().getResourceAsStream("/assets/icons/light-settings.png"));
+            BufferedImage buff_lightIcoExit = ImageIO.read(getClass().getResourceAsStream("/assets/icons/light-exit.png"));
+
+            BufferedImage buff_lightIcoAddProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/light-add_process.png"));
+            BufferedImage buff_lightIcoRemoveProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/light-remove_process.png"));
+            BufferedImage buff_lightIcoImportProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/light-import_process.png"));
+            BufferedImage buff_lightIcoRandomProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/light-random_process.png"));
+
+            BufferedImage buff_darkIcoSimulate = ImageIO.read(getClass().getResourceAsStream("/assets/icons/dark-simulate.png"));
+            BufferedImage buff_darkIcoHowToUse = ImageIO.read(getClass().getResourceAsStream("/assets/icons/dark-how_to_use.png"));
+            BufferedImage buff_darkIcoSettings = ImageIO.read(getClass().getResourceAsStream("/assets/icons/dark-settings.png"));
+            BufferedImage buff_darkIcoExit = ImageIO.read(getClass().getResourceAsStream("/assets/icons/dark-exit.png"));
+
+            BufferedImage buff_darkIcoAddProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/dark-add_process.png"));
+            BufferedImage buff_darkIcoRemoveProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/dark-remove_process.png"));
+            BufferedImage buff_darkIcoImportProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/dark-import_process.png"));
+            BufferedImage buff_darkIcoRandomProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/dark-random_process.png"));
+
+            lightIcoSimulate = resizeImage(buff_lightIcoSimulate, 1f);
+            lightIcoHowToUse = resizeImage(buff_lightIcoHowToUse, 1f);
+            lightIcoSettings = resizeImage(buff_lightIcoSettings, 1f);
+            lightIcoExit = resizeImage(buff_lightIcoExit, 1f);
+
+            lightIcoAddProcess = resizeImage(buff_lightIcoAddProcess, 0.35f);
+            lightIcoRemoveProcess = resizeImage(buff_lightIcoRemoveProcess, 0.35f);
+            lightIcoImportProcess = resizeImage(buff_lightIcoImportProcess, 0.35f);
+            lightIcoRandomProcess = resizeImage(buff_lightIcoRandomProcess, 0.35f);
+
+            darkIcoSimulate = resizeImage(buff_darkIcoSimulate, 1f);
+            darkIcoHowToUse = resizeImage(buff_darkIcoHowToUse, 1f);
+            darkIcoSettings = resizeImage(buff_darkIcoSettings, 1f);
+            darkIcoExit = resizeImage(buff_darkIcoExit, 1f);
+
+            darkIcoAddProcess = resizeImage(buff_darkIcoAddProcess, 0.35f);
+            darkIcoRemoveProcess = resizeImage(buff_darkIcoRemoveProcess, 0.35f);
+            darkIcoImportProcess = resizeImage(buff_darkIcoImportProcess, 0.35f);
+            darkIcoRandomProcess = resizeImage(buff_darkIcoRandomProcess, 0.35f);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void initializeImages() {
         System.out.println("Loading Images...");
         try {
-            BufferedImage buff_icoSimulate = ImageIO.read(getClass().getResourceAsStream("/assets/icons/simulate.png"));
-            BufferedImage buff_icoHowToUse = ImageIO.read(getClass().getResourceAsStream("/assets/icons/how_to_use.png"));
-            BufferedImage buff_icoSettings = ImageIO.read(getClass().getResourceAsStream("/assets/icons/settings.png"));
-            BufferedImage buff_icoExit = ImageIO.read(getClass().getResourceAsStream("/assets/icons/exit.png"));
+            backgroundDark = ImageIO.read(getClass().getResourceAsStream("/assets/images/background-dark.png"));
+            backgroundLight = ImageIO.read(getClass().getResourceAsStream("/assets/images/background-light.png"));
 
-            BufferedImage buff_icoAddProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/add_process.png"));
-            BufferedImage buff_icoRemoveProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/remove_process.png"));
-            BufferedImage buff_icoImportProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/import_process.png"));
-            BufferedImage buff_icoRandomProcess = ImageIO.read(getClass().getResourceAsStream("/assets/icons/random_process.png"));
-
-            icoSimulate = resizeImage(buff_icoSimulate, 0.06f);
-            icoHowToUse = resizeImage(buff_icoHowToUse, 0.06f);
-            icoSettings = resizeImage(buff_icoSettings, 0.06f);
-            icoExit = resizeImage(buff_icoExit, 0.06f);
-
-            icoAddProcess = resizeImage(buff_icoAddProcess, 0.06f);
-            icoRemoveProcess = resizeImage(buff_icoRemoveProcess, 0.06f);
-            icoImportProcess = resizeImage(buff_icoImportProcess, 0.06f);
-            icoRandomProcess = resizeImage(buff_icoRandomProcess, 0.06f);
+            howToUseAlgo = ImageIO.read(getClass().getResourceAsStream("/assets/images/howtouse-algorithm.png"));
+            howToUseInput = ImageIO.read(getClass().getResourceAsStream("/assets/images/howtouse-inputs.png"));
+            howToUseButtons = ImageIO.read(getClass().getResourceAsStream("/assets/images/howtouse-buttons.png"));
+            howToUseOutput = ImageIO.read(getClass().getResourceAsStream("/assets/images/howtouse-output.png"));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -113,8 +204,7 @@ public class Branding {
         BufferedImage resized = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g2d = resized.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                            RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2d.drawImage(tmp, 0, 0, null);
         g2d.dispose();
         

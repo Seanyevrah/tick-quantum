@@ -529,4 +529,34 @@ public class SimulatorOutput extends JPanel {
         tableScrollPane.revalidate();
         tableScrollPane.repaint();
     }
+
+    /**
+     * Re-creates all data rows with fresh borders/colours from the current theme.
+     * If no simulation has been run yet the placeholder rows are also refreshed.
+     */
+    public void refreshStyles() {
+        java.util.ArrayList<model.Process> results = mainEngine.getFinalProcesses();
+        if (results != null && !results.isEmpty()) {
+            updateProcessTable(results);
+        } else {
+            // Rebuild the placeholder rows shown before any simulation runs
+            Object[][] data = {
+                { "P1", "2", "0", "N/A", "0", "2", "0", "2" },
+                { "P2", "2", "2", "N/A", "0", "2", "0", "2" },
+                { "P3", "2", "4", "N/A", "0", "2", "0", "2" },
+            };
+            Color[] placeholderColors = { P1_COLOR, P2_COLOR, P3_COLOR };
+
+            JPanel dataPanel = new JPanel();
+            dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
+            dataPanel.setOpaque(false);
+            for (int i = 0; i < data.length; i++) {
+                dataPanel.add(Box.createVerticalStrut(8));
+                dataPanel.add(createDataRow(data[i], placeholderColors[i]));
+            }
+            tableScrollPane.setViewportView(dataPanel);
+            tableScrollPane.revalidate();
+            tableScrollPane.repaint();
+        }
+    }
 }
