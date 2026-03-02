@@ -79,11 +79,7 @@ public class MainMenu extends JPanel {
 
         exitBtn.addActionListener(e -> System.exit(0));
     }
-
-    /**
-     * Called after a theme toggle to update every button icon to match
-     * the new branding.dark/light icon set.
-     */
+    
     public void refreshIcons() {
         System.out.println("@ Main Menu icons switch");
         simulateBtn.setIcon(branding.lightIcoSimulate);

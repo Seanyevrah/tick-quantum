@@ -14,6 +14,7 @@ public class MainGUI {
     private JFrame mainFrame;
     private JPanel mainPanel;
 
+    private SplashScreen splashScreen;
     private MainMenu mainMenu;
     private MainMenuHowToUse mainMenuHowToUse;
     private MainMenuSettings mainMenuSettings;
@@ -44,6 +45,7 @@ public class MainGUI {
         mainPanel.setBackground(branding.dark);
         mainPanel.setLayout(new CardLayout());
         
+        splashScreen = new SplashScreen(engine, branding, mainPanel);
         mainMenu = new MainMenu(engine, branding, mainPanel);
         mainMenuHowToUse = new MainMenuHowToUse(engine, branding, mainPanel);
         mainMenuSettings = new MainMenuSettings(engine, branding, mainPanel);
@@ -51,6 +53,7 @@ public class MainGUI {
         simulatorMain = new SimulatorMain(engine, branding, mainPanel);
         simulatorOutput = new SimulatorOutput(engine, branding, mainPanel);
         
+        mainPanel.add(splashScreen, "SplashScreen");
         mainPanel.add(mainMenu, "MainMenu");
         mainPanel.add(mainMenuHowToUse, "HowToUse");
         mainPanel.add(mainMenuSettings, "Settings");

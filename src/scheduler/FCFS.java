@@ -13,7 +13,7 @@ public class FCFS {
 
     public ArrayList<Process> run(ArrayList<Process> process) {
         ArrayList<Process> processResult = new ArrayList<>();
-
+        
         return processResult;
     }
 
